@@ -7,17 +7,19 @@ on:
 
 jobs:
   deploy:
-    name: front-deploy
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-
     steps:
-      - name: checkout source code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      - name: SSH-deploy
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+
+      - name: deploy front
+        if: steps.changes.outputs.frontend == 'true'
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
@@ -25,5 +27,8 @@ jobs:
           port: ${{ secrets.REMOTE_PORT }}
           password: ${{ secrets.REMOTE_PASSWORD }}
           script: |
-            cd /repository
-            mkdir hello
+            cd /home/ubuntu/fe-deploy-test
+            git pull origin fe-deploy-test
+            npm install
+            npm run build
+            pm2 restart fe-deploy-test
