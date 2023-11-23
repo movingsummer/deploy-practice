@@ -29,6 +29,3 @@ jobs:
           script: |
             cd /home/ubuntu/fe-deploy-test
             git pull origin fe-deploy-test
-            npm install
-            npm run build
-            pm2 restart fe-deploy-test
