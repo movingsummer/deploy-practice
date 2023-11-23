@@ -11,21 +11,23 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: dorny/paths-filter@v2.11.1
-        id: changes
+      - name: Install Node.js
+        uses: actions/setup-node@v2
         with:
-          filters: |
-            frontend:
-              - 'frontend/**'
+          node-version: "14.x"
 
-      - name: deploy front
-        if: steps.changes.outputs.frontend == 'true'
-        uses: appleboy/ssh-action@master
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      - name: Deploy to Server
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           port: ${{ secrets.REMOTE_PORT }}
           password: ${{ secrets.REMOTE_PASSWORD }}
-          script: |
-            cd /home/ubuntu
-            git pull origin fe-deploy-test
+          source: frontend/build
+          target: /home/ubuntu/frontend
