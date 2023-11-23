@@ -26,8 +26,4 @@ jobs:
           password: ${{ secrets.REMOTE_PASSWORD }}
           script: |
             cd /repository
-            git pull origin fe-deploy-test
-            cd /repository/frontend
-            npm install
-            npm run build
-            sudo service nginx restart
+            mkdir hello
